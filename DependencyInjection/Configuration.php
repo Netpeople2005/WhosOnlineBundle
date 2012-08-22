@@ -20,9 +20,11 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('whos_online');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode->children()
+                    ->scalarNode('inactive_in')->defaultValue('5 min')->end()
+                    ->scalarNode('offline_in')->defaultValue('30 min')->end()
+                    ->scalarNode('clear_in')->defaultValue('2 days')->end()
+                ->end();
 
         return $treeBuilder;
     }

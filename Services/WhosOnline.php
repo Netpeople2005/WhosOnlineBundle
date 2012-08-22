@@ -25,12 +25,12 @@ class WhosOnline
      */
     private $em;
 
-    public function __construct(Registry $em)
+    public function __construct(Registry $em, $inactiveIn, $offlineIn, $clearIn)
     {
         $this->em = $em->getEntityManager();
-        $this->inactiveIn = '+5 min';
-        $this->offlineIn = '+30 min';
-        $this->clearIn = '+2 days';
+        $this->inactiveIn = "-$inactiveIn";
+        $this->offlineIn = "-$offlineIn";
+        $this->clearIn = "+$clearIn";
     }
 
     public function registerOnline(TokenInterface $token, $ip)
@@ -119,7 +119,7 @@ class WhosOnline
         $inactiveIn = new \DateTime($this->inactiveIn);
 
         return $this->em->createQuery("
-                SELECT w WhosOnlineBundle:WhosOnline w 
+                SELECT w FROM WhosOnlineBundle:WhosOnline w 
                 WHERE w.lastActivity >= :inactiveIn
                         ")
                         ->setParameter('inactiveIn', $inactiveIn)
@@ -131,9 +131,8 @@ class WhosOnline
 
         $offlineIn = new \DateTime($this->offlineIn);
 
-
         return $this->em->createQuery("
-                SELECT w WhosOnlineBundle:WhosOnline w 
+                SELECT w FROM WhosOnlineBundle:WhosOnline w 
                 WHERE w.lastActivity >= :offlineIn
                         ")
                         ->setParameter('offlineIn', $offlineIn)
@@ -147,7 +146,7 @@ class WhosOnline
         if ('' == ($content = file_get_contents($fileName))) {
             //si no tenia una fecha creada, la creamos
             $date = new \DateTime();
-            file_put_contents($fileName, $date->format('d-m-Y'));
+            file_put_contents($fileName, $date->format(\DateTime::W3C));
             return TRUE;
         } else {
             //obtengo la fecha de la ultima limpieza.

@@ -1,9 +1,16 @@
 parameters:
-
+    whos_online.inactive_in: "5 min"
+    whos_online.offline_in: "30 min"
+    whos_online.clear_in: "2 days"
+    
 services:
     whos_online:
         class: Netpeople\WhosOnlineBundle\Services\WhosOnline
-        arguments: ["@doctrine"]
+        arguments: 
+             - "@doctrine"
+             - "%whos_online.inactive_in%"
+             - "%whos_online.offline_in%"
+             - "%whos_online.clear_in%"
         
     whos_online.listener:
         class: Netpeople\WhosOnlineBundle\Listener\WhosOnlineListener
