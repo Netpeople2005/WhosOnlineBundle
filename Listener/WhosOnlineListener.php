@@ -82,7 +82,7 @@ class WhosOnlineListener implements LogoutHandlerInterface
 
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
-        $ip = $event->getRequest()->getClientIp();
+        $ip = $request->getClientIp();
 
         if ($token instanceof TokenInterface) {
 
