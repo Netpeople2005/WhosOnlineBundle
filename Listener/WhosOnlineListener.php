@@ -53,7 +53,7 @@ class WhosOnlineListener //implements EventSubscriberInterface
 //        );
 //    }
 
-    public function onKernelRequest(\Symfony\Component\HttpKernel\Event\GetResponseEvent $event)
+    public function onKernelResponse(\Symfony\Component\HttpKernel\Event\FilterResponseEvent $event)
     {
         //obtengo la instanacia del token
         $token = $this->context->getToken();
@@ -62,28 +62,22 @@ class WhosOnlineListener //implements EventSubscriberInterface
 
             $this->logger->info("registrando actividad en WhosOnline con Usuario Logueado");
 
+            //obtengo la instancia del usuario conectado.
+            /* @var $user \Symfony\Component\Security\Core\User\UserInterface */
             $user = $token->getUser();
             $this->logger->info("El usuario {$user->getUsername()} realizó una petición");
 
+            //consulto el registro en WhosOnline para el usuario conectado.
+            $whosOnline = $this->em->getRepository('WhosOnlineBundle:WhosOnline')
+                    ->findOneByUsername($user->getUsername());
 
-            $this->em->getRepository('WhosOnlineBundle:WhosOnline')
-                    ->createQueryBuilder('w')
-                    ->update()->set('w.lastActivity', new DateTime())
-                    ->where('w.user = :user')
-                    ->setParameter('user', $user)
-                    ->getQuery()->execute();
-//
-//                $whosOnline = $this->em->getRepository('WhosOnlineBundle:WhosOnline')
-//                        ->createQueryBuilder('w')
-//                        ->where('w.user = :user')
-//                        ->setParameter('user', $user)
-//                        ->getQuery()
-//                        ->getSingleResult();
-//                if ( $whosOnline instanceof WhosOnline){
-//                    $whosOnline->setLastActivity(new \DateTime());
-//                    $this->em->persist($whosOnline);
-//                    $this->em->flush();
-//                }
+            //y si existe dicho usuario en WhosOnline, actualizo su lastActivity.
+            if ($whosOnline instanceof WhosOnline) {
+                $whosOnline->setLastActivity(new \DateTime());
+                $this->em->persist($whosOnline);
+                $this->em->flush();
+                $this->logger->info("Se actualiza el WhosOnline a {$whosOnline->getLastActivity()->format(\DateTime::W3C)}");
+            }
         }
     }
 
@@ -100,7 +94,7 @@ class WhosOnlineListener //implements EventSubscriberInterface
 
         if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
 
-            $whosOnline = new WhosOnline($user, $ip);
+            $whosOnline = new WhosOnline($user->getUsername(), $ip);
 
             $this->em->persist($whosOnline);
             $this->em->flush();

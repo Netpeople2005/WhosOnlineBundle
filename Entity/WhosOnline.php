@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Netpeople\WhosOnlineBundle\Entity\WhosOnline
  *
- * @ORM\Table()
+ * @ORM\Table(name="whos_online")
  * @ORM\Entity
  */
 class WhosOnline
@@ -25,9 +25,9 @@ class WhosOnline
     /**
      * @var object $user
      *
-     * @ORM\Column(name="user", type="object")
+     * @ORM\Column(name="username", type="string", length=200)
      */
-    private $user;
+    private $username;
 
     /**
      * @var string $ip
@@ -50,9 +50,9 @@ class WhosOnline
      */
     private $lastActivity;
 
-    function __construct($user = NULL, $ip = NULL)
+    function __construct($username = NULL, $ip = NULL)
     {
-        $this->setUser($user);
+        $this->setUsername($username);
         $this->setIp($ip);
         $this->setLastLogin(new \DateTime());
         $this->setLastActivity(new \DateTime());
@@ -71,21 +71,21 @@ class WhosOnline
     /**
      * Set user
      *
-     * @param object $user
+     * @param string $user
      */
-    public function setUser($user)
+    public function setUsername($username)
     {
-        $this->user = $user;
+        $this->username = $username;
     }
 
     /**
      * Get user
      *
-     * @return object 
+     * @return string 
      */
-    public function getUser()
+    public function getUsername()
     {
-        return $this->user;
+        return $this->username;
     }
 
     /**
