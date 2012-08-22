@@ -1,9 +1,13 @@
 parameters:
 
 services:
+    whos_online:
+        class: Netpeople\WhosOnlineBundle\Services\WhosOnline
+        arguments: ["@doctrine"]
+        
     whos_online.listener:
         class: Netpeople\WhosOnlineBundle\Listener\WhosOnlineListener
-        arguments: ["@security.context", "@doctrine", "@logger"]
+        arguments: ["@security.context", "@whos_online", "@logger"]
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: "onKernelResponse" }
             - { name: kernel.event_listener, event: security.interactive_login, method: "onLogin" }
