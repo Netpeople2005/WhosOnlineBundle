@@ -14,6 +14,12 @@ use Netpeople\WhosOnlineBundle\Entity\WhosOnline as MyEntity;
 class WhosOnline
 {
 
+    protected $inactiveIn;
+    
+    protected $offlineIn;
+    
+    protected $clearIn;
+
     /**
      * @var \Doctrine\ORM\EntityManager 
      */
@@ -22,6 +28,9 @@ class WhosOnline
     public function __construct(Registry $em)
     {
         $this->em = $em->getEntityManager();
+        $this->inactiveIn = '+5 min';
+        $this->offlineIn = '+30 min';
+        $this->clearIn = '+2 days';
     }
 
     public function registerOnline(TokenInterface $token, $ip)
@@ -82,14 +91,24 @@ class WhosOnline
 
     public function deleteOffline()
     {
-        $last = new \DateTime();
-
-        $last->modify("-5 min");
+        $offlineIn = new \DateTime($this->offlineIn);
 
         $whosOnline = $this->em->createQuery("
                 DELETE WhosOnlineBundle:WhosOnline w 
-                WHERE w.lastActivity < :lastActivity
-            ")->execute(array('lastActivity' => $last));
+                WHERE w.lastActivity < :offlineIn
+            ")->execute(array('offlineIn' => $offlineIn));
+
+        return TRUE;
+    }
+
+    public function clear()
+    {
+        $clearIn = new \DateTime($this->clearIn);
+
+        $whosOnline = $this->em->createQuery("
+                DELETE WhosOnlineBundle:WhosOnline w 
+                WHERE w.lastActivity < :clearIn
+            ")->execute(array('clearIn' => $clearIn));
 
         return TRUE;
     }
@@ -97,33 +116,50 @@ class WhosOnline
     public function getActiveUsers()
     {
 
-        $last = new \DateTime();
-
-        $last->modify("-5 min");
-
+        $inactiveIn = new \DateTime($this->inactiveIn);
 
         return $this->em->createQuery("
                 SELECT w WhosOnlineBundle:WhosOnline w 
-                WHERE w.lastActivity >= :lastActivity
+                WHERE w.lastActivity >= :inactiveIn
                         ")
-                        ->setParameter('lastActivity', $last)
+                        ->setParameter('inactiveIn', $inactiveIn)
                         ->getResult();
     }
 
     public function getOnlineUsers()
     {
 
-        $last = new \DateTime();
-
-        $last->modify("-5 min");
+        $offlineIn = new \DateTime($this->offlineIn);
 
 
         return $this->em->createQuery("
                 SELECT w WhosOnlineBundle:WhosOnline w 
-                WHERE w.lastActivity >= :lastActivity
+                WHERE w.lastActivity >= :offlineIn
                         ")
-                        ->setParameter('lastActivity', $last)
+                        ->setParameter('offlineIn', $offlineIn)
                         ->getResult();
+    }
+
+    public function isClean()
+    {
+        $fileName = __DIR__ . '/../Files/last_clean.txt';
+
+        if ('' == ($content = file_get_contents($fileName))) {
+            //si no tenia una fecha creada, la creamos
+            $date = new \DateTime();
+            file_put_contents($fileName, $date->format('d-m-Y'));
+            return TRUE;
+        } else {
+            //obtengo la fecha de la ultima limpieza.
+            $lastClean = new \DateTime($content);
+            //le sumo el tiempo que debe haber entre cada limpieza
+            //y obtengo la diferencia con la fecha de hoy.
+            $interval = $lastClean->modify($this->clearIn)->diff(new \DateTime());
+            //si la diferencia de la ultima limpieza mas el tiempo 
+            //entre limpiezas es mayor a la fecha actual,
+            //se debe hacer limpieza.
+            return $interval->format('%r%d') <= 0;
+        }
     }
 
 }

@@ -56,6 +56,10 @@ class WhosOnlineListener implements LogoutHandlerInterface
                 $this->logger->info("Se actualiza el WhosOnline del User {$token->getUsername()}");
             }
         }
+        //si no se ha hecho limpieza de la tabla, la hacemos.
+        if (!$this->whosOnline->isClean()){
+            $this->whosOnline->clear();
+        }
     }
 
     /**
