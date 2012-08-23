@@ -201,6 +201,9 @@ class WhosOnline
                 ->getQuery()
                 ->execute();
 
+        //actualizo el archivo a la fecha y hora actual.
+        $this->updateLastClean();
+
         return TRUE;
     }
 
@@ -230,14 +233,21 @@ class WhosOnline
     public function getOnlineUsers()
     {
         $offlineIn = new \DateTime($this->offlineIn);
+        $inactiveIn = new \DateTime($this->inactiveIn);
 
-        return $this->em->createQueryBuilder()
-                        ->select('w')
-                        ->from('WhosOnlineBundle:WhosOnline', 'w')
-                        ->where('w.lastActivity >= :offlineIn')
-                        ->setParameter('offlineIn', $offlineIn)
-                        ->getQuery()
-                        ->getResult();
+        $res = $this->em->createQueryBuilder()
+                ->select('w')
+                ->from('WhosOnlineBundle:WhosOnline', 'w')
+                ->where('w.lastActivity >= :offlineIn')
+                ->setParameter('offlineIn', $offlineIn)
+                ->getQuery()
+                ->getResult();
+        foreach ((array) $res as $e) {
+            if ($e->getLastActivity() < $inactiveIn) {
+                $e->setActive(FALSE);
+            }
+        }
+        return $res;
     }
 
     /**
@@ -267,13 +277,13 @@ class WhosOnline
             $lastClean = new \DateTime($content);
             //obtengo la fecha y hora actual
             $now = new \DateTime('now');
-            
+
             //le sumo el tiempo que debe haber entre cada limpieza
             $lastClean->modify($this->clearIn);
-            //si la fecha actual es mayor a la fecha de la ultima
+            //si la fecha actual es menor a la fecha de la ultima
             //limpieza mas el tiempo entre limpiezas,
             //asumimos que la bd esta limpia aun.
-            return $now > $lastClean;
+            return $now < $lastClean;
         }
     }
 
