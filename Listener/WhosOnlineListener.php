@@ -78,9 +78,17 @@ class WhosOnlineListener implements LogoutHandlerInterface
                 }
             } else {
                 //si no está registrado aun, lo agrego al WhosOnline
-                //solo si está permitido el registro de usuarios anonimos.
-                if ($this->registerAnonymous && $this->whosOnline->registerOnline($token, $ip)) {
-                    $this->logger->info("Registrando al Usuario {$token->getUsername()} en el WhosOnline");
+                //si es un usuario anonimo
+                if ($token instanceof \Symfony\Component\Security\Core\Authentication\Token\AnonymousToken) {
+                    //lo agrego solo si está permitido el registro de usuarios anonimos.
+                    if ($this->registerAnonymous && $this->whosOnline->registerOnline($token, $ip)) {
+                        $this->logger->info("Registrando al Usuario {$token->getUsername()} en el WhosOnline");
+                    }
+                } else {
+                    //si no es anonimo lo registro.
+                    if ($this->whosOnline->registerOnline($token, $ip)) {
+                        $this->logger->info("Registrando al Usuario {$token->getUsername()} en el WhosOnline");
+                    }
                 }
             }
         }
@@ -102,9 +110,7 @@ class WhosOnlineListener implements LogoutHandlerInterface
     {
         $token = $this->context->getToken();
         $ip = $event->getRequest()->getClientIp();
-
         if ($token instanceof TokenInterface) {
-
             if ($this->whosOnline->registerOnline($token, $ip)) {
                 $this->logger->info("Registrando al Usuario {$token->getUsername()} en el WhosOnline");
             }
