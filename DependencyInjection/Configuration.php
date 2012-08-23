@@ -24,6 +24,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('inactive_in')->defaultValue('5 min')->end()
                     ->scalarNode('offline_in')->defaultValue('30 min')->end()
                     ->scalarNode('clear_in')->defaultValue('2 days')->end()
+                    ->scalarNode('register_anonymous')->defaultFalse()->end()
                 ->end();
 
         return $treeBuilder;

@@ -35,16 +35,24 @@ class WhosOnlineListener implements LogoutHandlerInterface
     private $logger;
 
     /**
+     * Indica si se deben registrar usuarios anonimos ó no
+     * 
+     * @var boolean 
+     */
+    protected $registerAnonymous;
+
+    /**
      * Constructor...
      * @param SecurityContext $context
      * @param WhosOnline $whosOnline
      * @param LoggerInterface $logger 
      */
-    public function __construct(SecurityContext $context, WhosOnline $whosOnline, LoggerInterface $logger)
+    public function __construct(SecurityContext $context, WhosOnline $whosOnline, LoggerInterface $logger, $registerAnonymous)
     {
         $this->context = $context;
         $this->whosOnline = $whosOnline;
         $this->logger = $logger;
+        $this->registerAnonymous = $registerAnonymous;
     }
 
     /**
@@ -70,7 +78,8 @@ class WhosOnlineListener implements LogoutHandlerInterface
                 }
             } else {
                 //si no está registrado aun, lo agrego al WhosOnline
-                if ($this->whosOnline->registerOnline($token, $ip)) {
+                //solo si está permitido el registro de usuarios anonimos.
+                if ($this->registerAnonymous && $this->whosOnline->registerOnline($token, $ip)) {
                     $this->logger->info("Registrando al Usuario {$token->getUsername()} en el WhosOnline");
                 }
             }
