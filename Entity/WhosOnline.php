@@ -44,6 +44,12 @@ class WhosOnline
     private $lastLogin;
 
     /**
+     *
+     * @var boolean 
+     */
+    private $isActive;
+
+    /**
      * @var datetime $lastActivity
      *
      * @ORM\Column(name="lastActivity", type="datetime")
@@ -146,6 +152,16 @@ class WhosOnline
     public function getLastActivity()
     {
         return $this->lastActivity;
+    }
+
+    public function setActive($active = TRUE)
+    {
+        $this->isActive = $active;
+    }
+
+    public function isActive()
+    {
+        return $this->isActive;
     }
 
 }
