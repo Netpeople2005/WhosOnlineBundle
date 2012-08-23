@@ -1,11 +1,12 @@
 {#% extends "::base.html.twig" %}
 {% block content %#}
 <h1>Usuarios Conectados</h1>
-<table>
+<table border="1">
     <thead>
         <tr>
             <th>Usuario</th>
             <th>IP</th>
+            <th>Estado</th>
             <th>Fecha Login</th>
             <th>Fecha Ultimo Acceso</th>
         </tr>
@@ -15,6 +16,7 @@
             <tr>
                 <td>{{ whos.username }}</td>
                 <td>{{ whos.ip }}</td>
+                <td>{{ whos.isActive() ? 'Activo' : 'Inactivo' }}</td>
                 <td>{{ whos.lastLogin.format('d-m-Y H:i:s') }}</td>
                 <td>{{ whos.lastActivity.format('d-m-Y H:i:s') }}</td>
             </tr>
