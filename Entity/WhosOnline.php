@@ -47,7 +47,7 @@ class WhosOnline
      *
      * @var boolean 
      */
-    private $isActive;
+    private $isActive = TRUE;
 
     /**
      * @var datetime $lastActivity
