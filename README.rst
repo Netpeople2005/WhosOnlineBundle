@@ -59,7 +59,7 @@ Opcional: Agregar la configuración del bundle en el config.ini
         #logueado es menor a este tiempo se considera online.
         offline_in: 6 hours #por defecto 30 min
 
-        #este parametro indica cada cuanto tiempo debe limpiarse datos antiguos
+        #este parametro indica cada cuanto tiempo deben borrarse datos antiguos
         #de la tabla de los WhosOnline
         clear_in: 10 days #por defecto 2 days
 
