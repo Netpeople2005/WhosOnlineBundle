@@ -265,13 +265,15 @@ class WhosOnline
         } else {
             //obtengo la fecha de la ultima limpieza.
             $lastClean = new \DateTime($content);
+            //obtengo la fecha y hora actual
+            $now = new \DateTime('now');
+            
             //le sumo el tiempo que debe haber entre cada limpieza
-            //y obtengo la diferencia con la fecha de hoy.
-            $interval = $lastClean->modify($this->clearIn)->diff(new \DateTime());
-            //si la diferencia de la ultima limpieza mas el tiempo 
-            //entre limpiezas es mayor a la fecha actual,
-            //se debe hacer limpieza.
-            return $interval->format('%r%d') <= 0;
+            $lastClean->modify($this->clearIn);
+            //si la fecha actual es mayor a la fecha de la ultima
+            //limpieza mas el tiempo entre limpiezas,
+            //asumimos que la bd esta limpia aun.
+            return $now > $lastClean;
         }
     }
 
