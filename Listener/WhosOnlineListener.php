@@ -11,7 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Description of RequestListener
+ * Clase con los metodos escuchas correspondientes para mantener
+ * actualizado el WhosOnline.
  *
  * @author maguirre
  */
@@ -24,7 +25,7 @@ class WhosOnlineListener implements LogoutHandlerInterface
     private $context;
 
     /**
-     * @var \Doctrine\ORM\EntityManager 
+     * @var WhosOnline
      */
     private $whosOnline;
 
@@ -34,10 +35,10 @@ class WhosOnlineListener implements LogoutHandlerInterface
     private $logger;
 
     /**
-     * Constructor
-     *
+     * Constructor...
      * @param SecurityContext $context
-     * @param Doctrine $doctrine
+     * @param WhosOnline $whosOnline
+     * @param LoggerInterface $logger 
      */
     public function __construct(SecurityContext $context, WhosOnline $whosOnline, LoggerInterface $logger)
     {
@@ -46,6 +47,14 @@ class WhosOnlineListener implements LogoutHandlerInterface
         $this->logger = $logger;
     }
 
+    /**
+     * Este metodo se ejecutará en todas las peticiones hechas al servidor.
+     * 
+     * Aqui se registra una actividad en el whos_online para 
+     * el usuario si está logueado.
+     * 
+     * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $event 
+     */
     public function onKernelResponse(\Symfony\Component\HttpKernel\Event\FilterResponseEvent $event)
     {
         $token = $this->context->getToken();
@@ -63,9 +72,12 @@ class WhosOnlineListener implements LogoutHandlerInterface
     }
 
     /**
+     * Este metodo se ejecutará cuando un usuario inicie sesion en el sistema.
      * 
-     *
-     * @param Event $event
+     * Aqui se crea un registro en la tabla whos_online con los datos
+     * del usuario.
+     * 
+     * @param \Symfony\Component\Security\Http\Event\InteractiveLoginEvent $event 
      */
     public function onLogin(\Symfony\Component\Security\Http\Event\InteractiveLoginEvent $event)
     {
@@ -80,6 +92,18 @@ class WhosOnlineListener implements LogoutHandlerInterface
         }
     }
 
+    /**
+     * Este metodo se ejecutará cuando un usuario cierre sesion en el sistema,
+     * solo si ha establecido a este servicio como un escucha en
+     * el parametro "handlers" del logout en el security.yml
+     * 
+     * Aqui se elimina el registro de la tabla whos_online que representa al
+     * usuario conectado y que está cerrando sesión.
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param TokenInterface $token 
+     */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
         $ip = $request->getClientIp();
