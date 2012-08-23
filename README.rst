@@ -47,18 +47,28 @@ Opcional: Agregar la configuración del bundle en el config.ini
     #app/config/config.yml 
     whos_online:
 
-        #cada parametro debe tener un valor de formatos de fecha y hora
-        #relativos de php, pero SIN SIGNO
-        # http://www.php.net/manual/es/datetime.formats.relative.php
+        #cada parametro debe tener un valor de formatos de fecha y hora relativos de php, pero SIN SIGNO<
 
+        #este parametro indica el tiempo maximo para considerar a un usuario
+        #activo en el sistema, es decir, si la ultima actividad de un usuario
+        #logueado es menor a este tiempo se considera activo.
         inactive_in: 10 min #por defecto 5 min
 
+        #este parametro indica el tiempo maximo para considerar a un usuario
+        #online en el sistema, es decir, si la ultima actividad de un usuario
+        #logueado es menor a este tiempo se considera online.
         offline_in: 6 hours #por defecto 30 min
 
+        #este parametro indica cada cuanto tiempo debe limpiarse datos antiguos
+        #de la tabla de los WhosOnline
         clear_in: 10 days #por defecto 2 days
 
-        #ningun parametro es obligatorio, todos son opcionales debido a que tiene
+        #ningun parametro es obligatorio, todos son opcionales debido a que tienen
         #valores por defecto.
+
+Los valores de los parametros son formatos de fecha y hora relativos de php
+http://www.php.net/manual/es/datetime.formats.relative.php
+
 
 Adicional
 ---------
