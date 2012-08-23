@@ -51,17 +51,17 @@ Opcional: Agregar la configuración del bundle en el config.ini
 
         #este parametro indica el tiempo maximo para considerar a un usuario
         #activo en el sistema, es decir, si la ultima actividad de un usuario
-        #logueado es menor a este tiempo se considera activo.
-        inactive_in: 10 min #por defecto 5 min
+        #logueado es menor a este tiempo se considera activo (por defecto 5 minutos).
+        inactive_in: 10 min
 
         #este parametro indica el tiempo maximo para considerar a un usuario
         #online en el sistema, es decir, si la ultima actividad de un usuario
-        #logueado es menor a este tiempo se considera online.
-        offline_in: 6 hours #por defecto 30 min
+        #logueado es menor a este tiempo se considera online (por defecto 30 minutos).
+        offline_in: 6 hours
 
         #este parametro indica cada cuanto tiempo deben borrarse datos antiguos
-        #de la tabla de los WhosOnline
-        clear_in: 10 days #por defecto 2 days
+        #de la tabla de los WhosOnline (por defecto 2 dias).
+        clear_in: 10 days
 
         #ningun parametro es obligatorio, todos son opcionales debido a que tienen
         #valores por defecto.
