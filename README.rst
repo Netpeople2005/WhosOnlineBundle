@@ -63,6 +63,10 @@ Opcional: Agregar la configuración del bundle en el config.ini
         #de la tabla de los WhosOnline (por defecto 2 dias).
         clear_in: 10 days
 
+        #el siguiente parametro indica si los usuarios identificados anonimamente en el sistema
+        #tambien deben ser registrados en el WhosOnline (por defecto no lo hace).
+        register_anonymous: false
+
         #ningun parametro es obligatorio, todos son opcionales debido a que tienen
         #valores por defecto.
 
