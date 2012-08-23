@@ -60,13 +60,23 @@ class WhosOnlineListener implements LogoutHandlerInterface
         $token = $this->context->getToken();
         $ip = $event->getRequest()->getClientIp();
 
+        //verifico la existencia de un TOKEN
         if ($token instanceof TokenInterface) {
-            if ($this->whosOnline->registerActivity($token, $ip)) {
-                $this->logger->info("Se actualiza el WhosOnline del User {$token->getUsername()}");
+            //verifico si ya está registrado el token en whos_online
+            if ($this->whosOnline->isOnline($token, $ip)) {
+                //si ya está online, registro una actividad
+                if ($this->whosOnline->registerActivity($token, $ip)) {
+                    $this->logger->info("Se actualiza el WhosOnline del User {$token->getUsername()}");
+                }
+            } else {
+                //si no está registrado aun, lo agrego al WhosOnline
+                if ($this->whosOnline->registerOnline($token, $ip)) {
+                    $this->logger->info("Registrando al Usuario {$token->getUsername()} en el WhosOnline");
+                }
             }
         }
         //si no se ha hecho limpieza de la tabla, la hacemos.
-        if (!$this->whosOnline->isClean()){
+        if (!$this->whosOnline->isClean()) {
             $this->whosOnline->clear();
         }
     }
@@ -86,7 +96,7 @@ class WhosOnlineListener implements LogoutHandlerInterface
 
         if ($token instanceof TokenInterface) {
 
-            if($this->whosOnline->registerOnline($token, $ip)) {
+            if ($this->whosOnline->registerOnline($token, $ip)) {
                 $this->logger->info("Registrando al Usuario {$token->getUsername()} en el WhosOnline");
             }
         }
@@ -110,7 +120,7 @@ class WhosOnlineListener implements LogoutHandlerInterface
 
         if ($token instanceof TokenInterface) {
 
-            if($this->whosOnline->delete($token, $ip)) {
+            if ($this->whosOnline->delete($token, $ip)) {
                 $this->logger->info("Removido el Usuario {$token->getUsername()} del WhosOnline");
             }
         }
