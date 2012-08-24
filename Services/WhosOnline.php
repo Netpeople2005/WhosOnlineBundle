@@ -71,7 +71,7 @@ class WhosOnline
         $this->inactiveIn = "-$inactiveIn";
         $this->offlineIn = "-$offlineIn";
         $this->clearIn = "+$clearIn";
-        $this->fileNameLastClean = dirname(__DIR__) . '/Files/last_clean.txt';
+        $this->fileNameLastClean = dirname(dirname(__DIR__)) . '/Files/last_clean.txt';
     }
 
     /**
