@@ -86,9 +86,9 @@ class WhosOnline
     {
 
         //verifico si ya existe en la tabla
-        if ($this->isOnline($token, $ip)) {
+        if ($this->exist($token, $ip)) {
             //si existe lo que hago es actualizar :-)
-            return $this->registerActivity($token, $ip);
+            return $this->registerActivity($token, $ip, TRUE);
         } else {
             //si no existe creo el registro
             $whosOnline = new MyEntity($token->getUsername(), $ip);
@@ -101,7 +101,8 @@ class WhosOnline
     }
 
     /**
-     * Devuelve TRUE si el usuario está registrado en el WhosOnline
+     * Devuelve TRUE si el usuario está registrado en el WhosOnline y
+     * está como Online aun.
      * @param TokenInterface $token
      * @param type $ip IP desde donde está conectado el usuario.
      * @return type 
@@ -126,23 +127,47 @@ class WhosOnline
     }
 
     /**
+     * Devuelve TRUE si el usuario está registrado en el WhosOnline
+     * @param TokenInterface $token
+     * @param type $ip IP desde donde está conectado el usuario.
+     * @return type 
+     */
+    public function exist(TokenInterface $token, $ip)
+    {
+        $res = $this->em->createQueryBuilder()
+                ->select('COUNT(w)')
+                ->from('WhosOnlineBundle:WhosOnline', 'w')
+                ->where('w.username = :username 
+                    AND w.ip = :ip')
+                ->setParameter('username', $token->getUsername())
+                ->setParameter('ip', $ip)
+                ->getQuery()
+                ->getSingleScalarResult();
+
+        return $res > 0;
+    }
+
+    /**
      * Actualiza el lastActivity del usuario para mantenerlo activo
      * @param TokenInterface $token
      * @param type $ip IP desde donde está conectado el usuario.
      * @return boolean 
      */
-    public function registerActivity(TokenInterface $token, $ip)
+    public function registerActivity(TokenInterface $token, $ip, $updateLastLogin = FALSE)
     {
         //actualizo el atributo lastActivity del registro 
         //que representa al usuario logueado.
-        $this->em->createQueryBuilder()
+        $queryBuilder = $this->em->createQueryBuilder()
                 ->update('WhosOnlineBundle:WhosOnline', 'w')
                 ->set('w.lastActivity', ':now')
                 ->where('w.username = :username AND w.ip = :ip')
                 ->setParameter('now', new \DateTime())
                 ->setParameter('username', $token->getUsername())
-                ->setParameter('ip', $ip)
-                ->getQuery()
+                ->setParameter('ip', $ip);
+        if (TRUE === $updateLastLogin) {
+            $queryBuilder->set('w.lastLogin', ':now');
+        }
+        $queryBuilder->getQuery()
                 ->execute();
         return TRUE;
     }
