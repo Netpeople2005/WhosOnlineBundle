@@ -1,0 +1,26 @@
+{
+    "name": "optime/whos_online",
+    "description": "Bundle para implementar la funcionalidad del whos online del DNA",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": ">=2.3"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile"
+        ],
+        "post-update-cmd": [
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile"
+        ]
+    },
+    "autoload": {
+        "psr-0": { "Netpeople\\WhosOnlineBundle\\": "" }
+    },
+    "target-dir": "Netpeople/WhosOnlineBundle"
+}

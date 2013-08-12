@@ -2,12 +2,12 @@
 
 namespace Netpeople\WhosOnlineBundle\Services;
 
-use Symfony\Bundle\DoctrineBundle\Registry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Netpeople\WhosOnlineBundle\Entity\WhosOnline as MyEntity;
 
 /**
- * Servicio que gestiona y mantiene registros de los 
+ * Servicio que gestiona y mantiene registros de los
  * usuarios en linea en la aplicacíon.
  *
  * @author maguirre
@@ -18,14 +18,14 @@ class WhosOnline
     /**
      * Indica el tiempo limite para considerar a un usuario como activo
      * en el sistema.
-     * 
+     *
      * ejemplo:
-     * 
+     *
      * si inactiveIn es igual a +5 min significa que los usuarios
      * con un lastActivity menor a ese tiempo están activos en el sistema
      * y los que tengan un tiempo mayor, son considerados inactivos
      *
-     * @var string 
+     * @var string
      */
     protected $inactiveIn;
 
@@ -33,28 +33,28 @@ class WhosOnline
      * Indica el tiempo limite para considerar a un usuario como online en el
      * sistema.
      *
-     * @var string 
+     * @var string
      */
     protected $offlineIn;
 
     /**
      * Indica cada cuanto tiempo debe limpiarse la tabla del whos_online
      * Para borrar usuarios logueados con IP que han cambiado, etc.
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $clearIn;
 
     /**
-     * @var \Doctrine\ORM\EntityManager 
+     * @var \Doctrine\ORM\EntityManager
      */
     protected $em;
 
     /**
      * Dirección del archivo donde se encuentra la fecha y hora de la
      * ultima limpieza de la tabla WhosOnline.
-     * 
-     * @var string 
+     *
+     * @var string
      */
     private $fileNameLastClean;
 
@@ -63,11 +63,11 @@ class WhosOnline
      * @param Registry $em objeto doctrine
      * @param string $inactiveIn
      * @param string $offlineIn
-     * @param string $clearIn 
+     * @param string $clearIn
      */
     public function __construct(Registry $em, $inactiveIn, $offlineIn, $clearIn)
     {
-        $this->em = $em->getEntityManager();
+        $this->em = $em->getManager();
         $this->inactiveIn = "-$inactiveIn";
         $this->offlineIn = "-$offlineIn";
         $this->clearIn = "+$clearIn";
@@ -77,10 +77,10 @@ class WhosOnline
     /**
      * Registra a un usuario en el WhosOnline si no existia.
      * si ya existia actualiza su actividad.
-     * 
+     *
      * @param TokenInterface $token
      * @param stirng $ip IP desde donde está conectado el usuario.
-     * @return boolean 
+     * @return boolean
      */
     public function registerOnline(TokenInterface $token, $ip)
     {
@@ -105,7 +105,7 @@ class WhosOnline
      * está como Online aun.
      * @param TokenInterface $token
      * @param type $ip IP desde donde está conectado el usuario.
-     * @return type 
+     * @return type
      */
     public function isOnline(TokenInterface $token, $ip)
     {
@@ -114,7 +114,7 @@ class WhosOnline
         $res = $this->em->createQueryBuilder()
                 ->select('COUNT(w)')
                 ->from('WhosOnlineBundle:WhosOnline', 'w')
-                ->where('w.username = :username 
+                ->where('w.username = :username
                     AND w.ip = :ip
                     AND w.lastActivity >= :offlineIn')
                 ->setParameter('username', $token->getUsername())
@@ -130,14 +130,14 @@ class WhosOnline
      * Devuelve TRUE si el usuario está registrado en el WhosOnline
      * @param TokenInterface $token
      * @param type $ip IP desde donde está conectado el usuario.
-     * @return type 
+     * @return type
      */
     public function exist(TokenInterface $token, $ip)
     {
         $res = $this->em->createQueryBuilder()
                 ->select('COUNT(w)')
                 ->from('WhosOnlineBundle:WhosOnline', 'w')
-                ->where('w.username = :username 
+                ->where('w.username = :username
                     AND w.ip = :ip')
                 ->setParameter('username', $token->getUsername())
                 ->setParameter('ip', $ip)
@@ -151,11 +151,11 @@ class WhosOnline
      * Actualiza el lastActivity del usuario para mantenerlo activo
      * @param TokenInterface $token
      * @param type $ip IP desde donde está conectado el usuario.
-     * @return boolean 
+     * @return boolean
      */
     public function registerActivity(TokenInterface $token, $ip, $updateLastLogin = FALSE)
     {
-        //actualizo el atributo lastActivity del registro 
+        //actualizo el atributo lastActivity del registro
         //que representa al usuario logueado.
         $queryBuilder = $this->em->createQueryBuilder()
                 ->update('WhosOnlineBundle:WhosOnline', 'w')
@@ -176,7 +176,7 @@ class WhosOnline
      * Elimina a un Usuario del WhosOnline
      * @param TokenInterface $token
      * @param type $ip IP desde donde está conectado el usuario.
-     * @return boolean 
+     * @return boolean
      */
     public function delete(TokenInterface $token, $ip)
     {
@@ -193,7 +193,7 @@ class WhosOnline
 
     /**
      * Elimina a los usuarios considerados Offline del WhosOnline.
-     * @return boolean 
+     * @return boolean
      */
     public function deleteOffline()
     {
@@ -213,7 +213,7 @@ class WhosOnline
      * Limpia Registros viejos de la tabla, cualquier usuario
      * deslogueado con el lastActivity menor al tiempo entre cada
      * limpieza.
-     * @return boolean 
+     * @return boolean
      */
     public function clear()
     {
@@ -235,7 +235,7 @@ class WhosOnline
     /**
      * Devuelve los registros en la tabla WhosOnline de los Usuarios
      * considerados activos en el sistema.
-     * @return array 
+     * @return array
      */
     public function getActiveUsers()
     {
@@ -253,7 +253,7 @@ class WhosOnline
     /**
      * Devuelve los registros en la tabla WhosOnline de los Usuarios
      * considerados online en el sistema.
-     * @return array 
+     * @return array
      */
     public function getOnlineUsers()
     {
@@ -277,13 +277,13 @@ class WhosOnline
 
     /**
      * Devuelve TRUE si la tabla de los WhosOnline es considerada limpia.
-     * 
+     *
      * Esta consideración se basa en la fecha de la ultima limpieza,
      * la cual está almacenada en un archivo de texto.
      * Si la diferencia de la fecha actual y la fecha de la ultima limpieza es
      * mayor al tiempo establecido entre limpiezas, esta función devolverá FALSE
-     * 
-     * @return boolean 
+     *
+     * @return boolean
      */
     public function isClean()
     {
@@ -315,7 +315,7 @@ class WhosOnline
     /**
      * Actualiza el archivo con la info de la ultima actualización
      * a la fecha y hora actual
-     * @param \DateTime $date 
+     * @param \DateTime $date
      */
     protected function updateLastClean()
     {
